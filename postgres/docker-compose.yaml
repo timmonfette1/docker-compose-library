@@ -1,0 +1,60 @@
+services:
+  postgres:
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4096M
+    environment:
+      NVIDIA_VISIBLE_DEVICES: void
+      PGDATA: /var/lib/postgresql/18/docker
+      PGPORT: '5432'
+      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_USER: $POSTGRES_USER
+      TZ: Etc/UTC
+      UMASK: '002'
+      UMASK_SET: '002'
+    healthcheck:
+      interval: 30s
+      retries: 5
+      start_interval: 2s
+      start_period: 15s
+      test:
+        - CMD
+        - pg_isready
+        - '-h'
+        - 127.0.0.1
+        - '-p'
+        - '5432'
+        - '-U'
+        - $POSTGRES_USER
+        - '-d'
+        - main
+      timeout: 5s
+    image: postgres:18
+    platform: linux/amd64
+    ports:
+      - mode: ingress
+        protocol: tcp
+        published: 5432
+        target: 5432
+    privileged: False
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges=true
+    shm_size: 256M
+    stdin_open: False
+    stop_grace_period: 60s
+    tty: False
+    user: '568:568'
+    volumes:
+      - bind:
+          create_host_path: False
+          propagation: rprivate
+        read_only: False
+        source: /mnt/main/apps/postgres
+        target: /var/lib/postgresql
+        type: bind

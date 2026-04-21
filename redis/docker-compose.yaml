@@ -1,0 +1,32 @@
+services:
+  redis:
+    cap_drop:
+      - ALL
+    environment:
+      - REDIS_ARGS=--appendonly yes
+    healthcheck:
+      interval: 30s
+      retries: 5
+      start_interval: 2s
+      start_period: 15s
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      timeout: 5s
+    image: redis:8
+    ports:
+      - mode: ingress
+        protocol: tcp
+        published: 6379
+        target: 6379
+    privileged: False
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges=true
+    user: '568:568'
+    volumes:
+      - bind:
+          create_host_path: False
+          propagation: rprivate
+        read_only: False
+        source: /mnt/main/apps/redis
+        target: /data
+        type: bind
