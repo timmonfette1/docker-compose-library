@@ -1,5 +1,5 @@
 # Docker Compose Library
-A simple library that holds all of the docker compose files I used to deploy containers within my local infrastructure.
+A simple library that holds all of the docker compose files I use to deploy containers within my local infrastructure.
 
 All compose files have had sensitive values redacted.
 
