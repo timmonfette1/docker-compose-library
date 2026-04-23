@@ -58,3 +58,10 @@ services:
         source: /mnt/main/apps/postgres
         target: /var/lib/postgresql
         type: bind
+    networks:
+      postgres-network:
+        aliases:
+          - postgresdb
+networks:
+  postgres-network:
+    name: postgres-network

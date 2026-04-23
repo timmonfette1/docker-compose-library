@@ -30,3 +30,10 @@ services:
         source: /mnt/main/apps/redis
         target: /data
         type: bind
+    networks:
+      redis-network:
+        aliases:
+          - cache
+networks:
+  redis-network:
+    name: redis-network
