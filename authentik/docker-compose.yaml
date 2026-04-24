@@ -1,0 +1,119 @@
+services:
+  authentik:
+    command: server
+    cap_drop:
+      - ALL
+    networks:
+      - authentik-network
+      - postgres-network
+    environment:
+      AUTHENTIK_POSTGRESQL__SSLMODE: allow
+      AUTHENTIK_POSTGRESQL__HOST: postgresdb
+      AUTHENTIK_POSTGRESQL__PORT: 5432
+      AUTHENTIK_POSTGRESQL__NAME: $AUTHENTIK_POSTGRES_DATABASE
+      AUTHENTIK_POSTGRESQL__USER: $AUTHENTIK_POSTGRES_USER
+      AUTHENTIK_POSTGRESQL__PASSWORD: $AUTHENTIK_POSTGRES_PASSWORD
+      AUTHENTIK_SECRET_KEY: $AUTHENTIK_SECRET_KEY
+      AUTHENTIK_EMAIL__HOST: $RESEND_HOST
+      AUTHENTIK_EMAIL__PORT: $RESEND_PORT
+      AUTHENTIK_EMAIL__USERNAME: $RESEND_USER
+      AUTHENTIK_EMAIL__PASSWORD: $RESEND_API_KEY
+      AUTHENTIK_EMAIL__USE_TLS: true
+      AUTHENTIK_EMAIL__USE_SSL: false
+      AUTHENTIK_EMAIL__TIMEOUT: 10
+      AUTHENTIK_EMAIL__FROM: authentik@<your domain>
+    image: authentik/server:2026.2
+    ports:
+      - mode: ingress
+        protocol: tcp
+        published: 9000
+        target: 9000
+      - mode: ingress
+        protocol: tcp
+        published: 9443
+        target: 9443
+    privileged: False
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges=true
+    shm_size: 512mb
+    user: '568:568'
+    volumes:
+      - bind:
+          create_host_path: False
+          propagation: rprivate
+        read_only: False
+        source: /mnt/main/apps/authentik/data
+        target: /data
+        type: bind
+      - bind:
+          create_host_path: False
+          propagation: rprivate
+        read_only: False
+        source: /mnt/main/apps/authentik/templates
+        target: /templates
+        type: bind
+  worker:
+    command: worker
+    cap_drop:
+      - ALL
+    networks:
+      - authentik-network
+      - postgres-network
+    environment:
+      AUTHENTIK_POSTGRESQL__SSLMODE: allow
+      AUTHENTIK_POSTGRESQL__HOST: postgresdb
+      AUTHENTIK_POSTGRESQL__PORT: 5432
+      AUTHENTIK_POSTGRESQL__NAME: $AUTHENTIK_POSTGRES_DATABASE
+      AUTHENTIK_POSTGRESQL__USER: $AUTHENTIK_POSTGRES_USER
+      AUTHENTIK_POSTGRESQL__PASSWORD: $AUTHENTIK_POSTGRES_PASSWORD
+      AUTHENTIK_SECRET_KEY: $AUTHENTIK_SECRET_KEY
+      AUTHENTIK_EMAIL__HOST: $RESEND_HOST
+      AUTHENTIK_EMAIL__PORT: $RESEND_PORT
+      AUTHENTIK_EMAIL__USERNAME: $RESEND_USER
+      AUTHENTIK_EMAIL__PASSWORD: $RESEND_API_KEY
+      AUTHENTIK_EMAIL__USE_TLS: true
+      AUTHENTIK_EMAIL__USE_SSL: false
+      AUTHENTIK_EMAIL__TIMEOUT: 10
+      AUTHENTIK_EMAIL__FROM: authentik@<your domain>
+    image: authentik/server:2026.2
+    privileged: False
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges=true
+    shm_size: 512mb
+    user: '568:568'
+    volumes:
+      - bind:
+          create_host_path: False
+          propagation: rprivate
+        read_only: False
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        type: bind
+      - bind:
+          create_host_path: False
+          propagation: rprivate
+        read_only: False
+        source: /mnt/main/apps/authentik/data
+        target: /data
+        type: bind
+      - bind:
+          create_host_path: False
+          propagation: rprivate
+        read_only: False
+        source: /mnt/main/apps/authentik/templates
+        target: /templates
+        type: bind
+      - bind:
+          create_host_path: False
+          propagation: rprivate
+        read_only: False
+        source: /mnt/main/apps/authentik/certs
+        target: /certs
+        type: bind
+networks:
+  authentik-network:
+    name: authentik-network
+  postgres-network:
+    external: true
