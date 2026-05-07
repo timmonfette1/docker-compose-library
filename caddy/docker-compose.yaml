@@ -1,0 +1,52 @@
+services:
+  caddy:
+    cap_drop:
+      - ALL
+    image: caddy:2.11-internal
+    ports:
+      - mode: ingress
+        protocol: tcp
+        published: 80
+        target: 80
+      - mode: ingress
+        protocol: tcp
+        published: 443
+        target: 443
+      - "443:443/udp"
+    environment:
+      - MY_DOMAIN=$CADDY_PROXY_DOMAIN
+      - MY_HOST_IP=$DOCKER_HOST_IP
+      - CLOUDFLARE_API_TOKEN=$CLOUDFLARE_API_TOKEN
+      - TZ=America/Los_Angeles
+    privileged: False
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges=true
+    user: '568:568'
+    volumes:
+      - /mnt/main/apps/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - bind:
+          create_host_path: False
+          propagation: rprivate
+        read_only: False
+        source: /mnt/main/apps/caddy/data
+        target: /data
+        type: bind
+      - bind:
+          create_host_path: False
+          propagation: rprivate
+        read_only: False
+        source: /mnt/main/apps/caddy/config
+        target: /config
+        type: bind
+    networks:
+      - caddy-network
+      - gitea-network
+      - authentik-network
+networks:
+  caddy-network:
+    name: caddy-network
+  gitea-network:
+    external: true
+  authentik-network:
+    external: true
