@@ -1,0 +1,37 @@
+{
+    servers {
+        listener_wrappers {
+            layer4 {
+                @ssh ssh
+                route @ssh {
+                        proxy gitea:2240
+                }
+                route
+            }
+            tls {
+                dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+            }
+        }
+    }
+}
+
+auth.{$MY_DOMAIN} {
+    reverse_proxy authentik:9000
+    tls {
+            dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+    }
+}
+
+git.{$MY_DOMAIN} {
+    reverse_proxy gitea:3000
+    tls {
+            dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+    }
+}
+
+wiki.{$MY_DOMAIN} {
+    reverse_proxy wiki:3000
+    tls {
+            dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+    }
+}

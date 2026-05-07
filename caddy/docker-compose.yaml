@@ -43,10 +43,13 @@ services:
       - caddy-network
       - gitea-network
       - authentik-network
+      - wiki-network
 networks:
   caddy-network:
     name: caddy-network
   gitea-network:
     external: true
   authentik-network:
+    external: true
+  wiki-network:
     external: true
