@@ -6,6 +6,7 @@ services:
     networks:
       - authentik-network
       - postgres-network
+      - caddy-network
     environment:
       AUTHENTIK_POSTGRESQL__SSLMODE: allow
       AUTHENTIK_POSTGRESQL__HOST: postgresdb
@@ -60,6 +61,7 @@ services:
     networks:
       - authentik-network
       - postgres-network
+      - caddy-network
     environment:
       AUTHENTIK_POSTGRESQL__SSLMODE: allow
       AUTHENTIK_POSTGRESQL__HOST: postgresdb
@@ -116,4 +118,6 @@ networks:
   authentik-network:
     name: authentik-network
   postgres-network:
+    external: true
+  caddy-network:
     external: true

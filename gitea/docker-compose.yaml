@@ -3,6 +3,13 @@ services:
     cap_drop:
       - ALL
     environment:
+      - GITEA__server__ROOT_URL=$GITEA_URL
+      - GITEA__server__SSH_DOMAIN=$GITEA_SSH_DOMAIN
+      - GITEA__server__DISABLE_SSH=false
+      - GITEA__server__START_SSH_SERVER=true
+      - GITEA__server__SSH_SERVER_USE_PROXY_PROTOCOL=false
+      - GITEA__server__SSH_PORT=443
+      - GITEA__server__SSH_LISTEN_PORT=2240
       - GITEA__database__DB_TYPE=postgres
       - GITEA__database__HOST=postgresdb:5432
       - GITEA__database__NAME=$GITEA_POSTGRES_DATABASE
@@ -15,6 +22,9 @@ services:
       - GITEA__mailer__SMTP_PORT=$RESEND_PORT
       - GITEA__mailer__USER=$RESEND_USER
       - GITEA__mailer__PASSWD=$RESEND_API_KEY
+      - GITEA__oauth2_client__ENABLE_AUTO_REGISTRATION=true
+      - GITEA__openid__ENABLE_OPENID_SIGNIN=false
+      - GITEA__openid__ENABLE_OPENID_SIGNUP=false
     image: docker.gitea.com/gitea:1.26-rootless
     ports:
       - mode: ingress
@@ -62,11 +72,11 @@ services:
     networks:
       - gitea-network
       - postgres-network
-      - authentik-network
+      - caddy-network
 networks:
   gitea-network:
     name: gitea-network
   postgres-network:
     external: true
-  authentik-network:
+  caddy-network:
     external: true
